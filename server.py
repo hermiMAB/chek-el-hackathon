@@ -1,33 +1,59 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from openai import AzureOpenAI
+from azure.cosmos import CosmosClient
+from azure.search.documents import SearchClient
+from azure.core.credentials import AzureKeyCredential
+from azure.cognitiveservices.speech import SpeechConfig, SpeechSynthesizer, SpeechRecognizer
+from azure.cognitiveservices.speech.audio import AudioOutputConfig, AudioInputStream
 import os
+import uuid
+import base64
+import wave
 from dotenv import load_dotenv
 
 load_dotenv()
-
 app = Flask(__name__, static_folder='public', static_url_path='')
 CORS(app)
 
+# Azure OpenAI Client
 client = AzureOpenAI(
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
     api_key=os.getenv("AZURE_OPENAI_KEY"),
     api_version="2024-02-01"
 )
 
-# Serve frontend
+# Azure Cosmos DB Client
+cosmos_client = CosmosClient(os.getenv("COSMOS_URL"), os.getenv("COSMOS_KEY"))
+database = cosmos_client.get_database_client("CheckElDB")
+scores_container = database.get_container_client("Scores")
+notes_container = database.get_container_client("Notes")
+
+# Azure AI Search Client
+search_client = SearchClient(os.getenv("SEARCH_ENDPOINT"), "notes-index", AzureKeyCredential(os.getenv("SEARCH_KEY")))
+
+# Serve multiple pages
 @app.route('/')
-def serve_index():
-    return send_from_directory('public', 'index.html')
+@app.route('/welcome')
+def serve_welcome():
+    return send_from_directory('public', 'welcome.html')
+
+@app.route('/ask-ai')
+def serve_ask_ai():
+    return send_from_directory('public', 'ask-ai.html')
+
+@app.route('/quiz')
+def serve_quiz():
+    return send_from_directory('public', 'quiz.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
     try:
         return send_from_directory('public', path)
     except FileNotFoundError:
-        return send_from_directory('public', 'index.html')  # For SPA routing
+        return send_from_directory('public', 'welcome.html')
 
-# Backend API routes
+# API Endpoints
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.get_json()
@@ -59,6 +85,89 @@ def quiz():
         return jsonify({"quiz": response.choices[0].message.content})
     except Exception as e:
         return jsonify({"quiz": f"Error: {str(e)}"}), 500
+
+@app.route('/api/save-score', methods=['POST'])
+def save_score():
+    data = request.get_json()
+    user_id = data.get('user_id', str(uuid.uuid4()))
+    points = data.get('points')
+    quiz_count = data.get('quiz_count')
+    try:
+        scores_container.upsert_item({
+            'id': user_id,
+            'points': points,
+            'quiz_count': quiz_count
+        })
+        return jsonify({"status": "saved"})
+    except Exception as e:
+        return jsonify({"status": f"Error: {str(e)}"}), 500
+
+@app.route('/api/text-to-speech', methods=['POST'])
+def text_to_speech():
+    data = request.get_json()
+    text = data.get('text')
+    try:
+        speech_config = SpeechConfig(subscription=os.getenv("SPEECH_KEY"), region=os.getenv("SPEECH_REGION"))
+        audio_config = AudioOutputConfig(filename="output.wav")
+        synthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
+        synthesizer.speak_text_async(text).get()
+        with open("output.wav", "rb") as audio_file:
+            audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
+        return jsonify({"audio": audio_data})
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+
+@app.route('/api/speech-to-text', methods=['POST'])
+def speech_to_text():
+    audio_file = request.files['audio']
+    audio_file.save('input.wav')
+    try:
+        speech_config = SpeechConfig(subscription=os.getenv("SPEECH_KEY"), region=os.getenv("SPEECH_REGION"))
+        with wave.open('input.wav', 'rb') as wav_file:
+            audio_input = AudioInputStream(wav_file)
+            recognizer = SpeechRecognizer(speech_config=speech_config, audio_config=audio_input)
+            result = recognizer.recognize_once_async().get()
+            return jsonify({"text": result.text if result.text else ""})
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+
+@app.route('/api/save-note', methods=['POST'])
+def save_note():
+    data = request.get_json()
+    note = data.get('note')
+    topic = data.get('topic')
+    try:
+        tag_response = client.chat.completions.create(
+            model=os.getenv("AZURE_OPENAI_MODEL"),
+            messages=[{"role": "user", "content": f"Generate 3 tags for the topic: {topic}"}],
+            max_tokens=50
+        )
+        tags = tag_response.choices[0].message.content.split(',')
+        note_id = str(uuid.uuid4())
+        notes_container.upsert_item({
+            'id': note_id,
+            'note': note,
+            'topic': topic,
+            'tags': tags
+        })
+        search_client.upload_documents([{
+            '@search.action': 'upload',
+            'id': note_id,
+            'content': note,
+            'topic': topic,
+            'tags': tags
+        }])
+        return jsonify({"status": "saved"})
+    except Exception as e:
+        return jsonify({"status": f"Error: {str(e)}"}), 500
+
+@app.route('/api/get-notes', methods=['GET'])
+def get_notes():
+    try:
+        notes = list(notes_container.read_all_items())
+        return jsonify(notes)
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
