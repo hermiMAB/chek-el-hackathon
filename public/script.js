@@ -6,7 +6,7 @@ async function askAI() {
     }
     document.getElementById('response').innerText = 'Loading...';
     try {
-        const response = await fetch('https://chek-el-hackathon-hermela.azurewebsites.net/api/chat', {
+        const response = await fetch('https://zuniques-hackathon-prd-wa-uaen-01-ethtecgbdbesd4gp.uaenorth-01.azurewebsites.net/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: topic })
@@ -26,7 +26,7 @@ async function takeQuiz() {
     }
     document.getElementById('quiz').innerText = 'Loading...';
     try {
-        const response = await fetch('https://chek-el-hackathon-hermela.azurewebsites.net/api/quiz', {
+        const response = await fetch('https://zuniques-hackathon-prd-wa-uaen-01-ethtecgbdbesd4gp.uaenorth-01.azurewebsites.net/api/quiz', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ topic })

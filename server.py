@@ -1,71 +1,64 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from openai import AzureOpenAI
-from dotenv import load_dotenv
 import os
-import logging
+from dotenv import load_dotenv
 
-app = Flask(__name__)
-CORS(app)
 load_dotenv()
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+app = Flask(__name__, static_folder='public', static_url_path='')
+CORS(app)
 
 client = AzureOpenAI(
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
     api_key=os.getenv("AZURE_OPENAI_KEY"),
-    api_version="2024-02-01"  # Use stable version
+    api_version="2024-02-01"
 )
-model = os.getenv("AZURE_OPENAI_MODEL")
 
+# Serve frontend
+@app.route('/')
+def serve_index():
+    return send_from_directory('public', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    try:
+        return send_from_directory('public', path)
+    except FileNotFoundError:
+        return send_from_directory('public', 'index.html')  # For SPA routing
+
+# Backend API routes
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    data = request.json
+    data = request.get_json()
     message = data.get('message')
     if not message:
-        logger.error("No message provided")
-        return jsonify({'error': 'No message provided'}), 400
+        return jsonify({"response": "No message provided"}), 400
     try:
-        logger.debug(f"Sending chat request for: {message}")
         response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": "You are a helpful study assistant."},
-                {"role": "user", "content": f"Explain {message} in simple terms for a university student."}
-            ],
+            model=os.getenv("AZURE_OPENAI_MODEL"),
+            messages=[{"role": "user", "content": message}],
             max_tokens=500
         )
-        content = response.choices[0].message.content
-        logger.debug(f"Chat response: {content}")
-        return jsonify({'response': content})
+        return jsonify({"response": response.choices[0].message.content})
     except Exception as e:
-        logger.error(f"Chat error: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"response": f"Error: {str(e)}"}), 500
 
 @app.route('/api/quiz', methods=['POST'])
 def quiz():
-    data = request.json
+    data = request.get_json()
     topic = data.get('topic')
     if not topic:
-        logger.error("No topic provided")
-        return jsonify({'error': 'No topic provided'}), 400
+        return jsonify({"quiz": "No topic provided"}), 400
     try:
-        logger.debug(f"Sending quiz request for: {topic}")
         response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": "You are a quiz generator."},
-                {"role": "user", "content": f"Generate 3 narrative-style multiple-choice questions about {topic} for university students, formatted as: Question: [text]\nA) [option]\nB) [option]\nC) [option]\nD) [option]\nAnswer: [letter]"}
-            ],
-            max_tokens=1000
+            model=os.getenv("AZURE_OPENAI_MODEL"),
+            messages=[{"role": "user", "content": f"Generate a quiz with 3 multiple-choice questions on {topic}."}],
+            max_tokens=500
         )
-        content = response.choices[0].message.content
-        logger.debug(f"Quiz response: {content}")
-        return jsonify({'quiz': content})
+        return jsonify({"quiz": response.choices[0].message.content})
     except Exception as e:
-        logger.error(f"Quiz error: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"quiz": f"Error: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
