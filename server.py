@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 from openai import AzureOpenAI
 from azure.cosmos import CosmosClient
 from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
-from azure.cognitiveservices.speech import SpeechConfig, SpeechSynthesizer, SpeechRecognizer
-from azure.cognitiveservices.speech.audio import AudioOutputConfig, AudioInputStream
+from azure.cognitiveservices.speech import SpeechConfig, SpeechSynthesizer, SpeechRecognizer, AudioOutputConfig, AudioInputStream
 import os
 import uuid
 import base64
@@ -14,7 +14,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__, static_folder='public', static_url_path='')
+app.config['SECRET_KEY'] = 'secret!'  # Required for SocketIO sessions
 CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")  # Initialize SocketIO
 
 # Azure OpenAI Client
 client = AzureOpenAI(
@@ -25,7 +27,7 @@ client = AzureOpenAI(
 
 # Azure Cosmos DB Client
 cosmos_client = CosmosClient(os.getenv("COSMOS_URL"), os.getenv("COSMOS_KEY"))
-database = cosmos_client.get_database_client("CheckElDB")
+database = cosmos_client.get_database_client("ChekElDB")
 scores_container = database.get_container_client("Scores")
 notes_container = database.get_container_client("Notes")
 
@@ -52,6 +54,16 @@ def serve_static(path):
         return send_from_directory('public', path)
     except FileNotFoundError:
         return send_from_directory('public', 'welcome.html')
+
+# SocketIO Events
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+    emit('gamification_update', {'message': 'Welcome to Chek El!'})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
 
 # API Endpoints
 @app.route('/api/chat', methods=['POST'])
@@ -98,7 +110,20 @@ def save_score():
             'points': points,
             'quiz_count': quiz_count
         })
-        return jsonify({"status": "saved"})
+        # Calculate badges
+        badges = []
+        if points >= 30:
+            badges.append("Quiz Novice")
+        if points >= 90:
+            badges.append("Quiz Master")
+        # Broadcast gamification update
+        socketio.emit('gamification_update', {
+            'user_id': user_id,
+            'points': points,
+            'badges': badges,
+            'message': f"User {user_id[:8]} earned {points} points and {', '.join(badges) or 'no badges'}!"
+        }, broadcast=True)
+        return jsonify({"status": "saved", "badges": badges})
     except Exception as e:
         return jsonify({"status": f"Error: {str(e)}"}), 500
 
@@ -170,4 +195,4 @@ def get_notes():
         return jsonify({"error": f"Error: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
+    socketio.run(app, host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
