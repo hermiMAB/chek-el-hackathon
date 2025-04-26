@@ -1,7 +1,26 @@
+const socket = io(); // Initialize SocketIO client
 let isVoiceEnabled = false;
 let points = 0;
 let quizCount = 0;
 const userId = 'user-' + Math.random().toString(36).substr(2, 9);
+
+// SocketIO Event Handlers
+socket.on('connect', () => {
+    console.log('Connected to server');
+});
+
+socket.on('gamification_update', (data) => {
+    const notification = document.getElementById('notification');
+    if (notification) {
+        notification.innerText = data.message;
+        notification.style.display = 'block';
+        setTimeout(() => { notification.style.display = 'none'; }, 5000);
+    }
+    if (data.user_id === userId) {
+        points = data.points;
+        updateGamification(data.badges);
+    }
+});
 
 // Ask AI Page
 const askButton = document.getElementById('askButton');
@@ -151,11 +170,10 @@ async function startQuiz() {
         });
         const data = await response.json();
         quizDiv.innerHTML = `<p>${data.quiz}</p><button id="submitQuiz" class="btn btn-primary">Submit Quiz</button>`;
-        document.getElementById('submitQuiz').addEventListener('click', () => {
+        document.getElementById('submitQuiz').addEventListener('click', async () => {
             points += 30;
             quizCount += 1;
-            updateGamification();
-            saveScore();
+            await saveScore();
             quizDiv.innerHTML += '<p class="text-success">Quiz completed! +30 points</p>';
         });
     } catch (e) {
@@ -163,27 +181,28 @@ async function startQuiz() {
     }
 }
 
-function updateGamification() {
+function updateGamification(badges) {
     pointsSpan.innerText = points;
     const progress = Math.min((points / 100) * 100, 100);
     progressBar.style.width = `${progress}%`;
-    let badges = '';
-    if (points >= 30) badges += '<span class="badge bg-primary">Quiz Novice</span> ';
-    if (points >= 90) badges += '<span class="badge bg-success">Quiz Master</span>';
-    badgesSpan.innerHTML = badges;
+    badgesSpan.innerHTML = badges.map(badge => `<span class="badge bg-primary">${badge}</span>`).join(' ');
 }
 
 async function saveScore() {
     try {
-        await fetch('/api/save-score', {
+        const response = await fetch('/api/save-score', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId, points, quiz_count: quizCount })
         });
+        const data = await response.json();
+        if (data.status === 'saved') {
+            updateGamification(data.badges);
+        }
     } catch (e) {
         console.error('Error saving score');
     }
 }
 
 // Initialize gamification
-if (pointsSpan) updateGamification();
+if (pointsSpan) updateGamification([]);
