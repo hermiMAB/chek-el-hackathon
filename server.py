@@ -1,38 +1,70 @@
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit
-from openai import AzureOpenAI
-from azure.cosmos import CosmosClient
-from azure.search.documents import SearchClient
-from azure.core.credentials import AzureKeyCredential
-from azure.cognitiveservices.speech import SpeechConfig, SpeechSynthesizer, SpeechRecognizer, AudioOutputConfig, AudioInputStream
+print("Starting server.py...")
 import os
 import uuid
 import base64
-import wave
 from dotenv import load_dotenv
+try:
+    print("Loading environment variables...")
+    load_dotenv()
+    print("Environment variables loaded:", {
+        "AZURE_OPENAI_ENDPOINT": os.getenv("AZURE_OPENAI_ENDPOINT"),
+        "AZURE_OPENAI_KEY": "SET" if os.getenv("AZURE_OPENAI_KEY") else "NOT SET",
+        "COSMOS_URL": os.getenv("COSMOS_URL"),
+        "SEARCH_ENDPOINT": os.getenv("SEARCH_ENDPOINT")
+    })
+except Exception as e:
+    print(f"Error loading .env: {e}")
 
-load_dotenv()
+try:
+    print("Importing Flask and dependencies...")
+    from flask import Flask, request, jsonify, send_from_directory
+    from flask_cors import CORS
+    from flask_socketio import SocketIO, emit
+except Exception as e:
+    print(f"Error importing Flask dependencies: {e}")
+
+try:
+    print("Importing Azure dependencies...")
+    from openai import AzureOpenAI
+    from azure.cosmos import CosmosClient
+    from azure.search.documents import SearchClient
+    from azure.core.credentials import AzureKeyCredential
+except Exception as e:
+    print(f"Error importing Azure dependencies: {e}")
+
+print("Initializing Flask app...")
 app = Flask(__name__, static_folder='public', static_url_path='')
 app.config['SECRET_KEY'] = 'secret!'  # Required for SocketIO sessions
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")  # Initialize SocketIO
 
 # Azure OpenAI Client
-client = AzureOpenAI(
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-    api_key=os.getenv("AZURE_OPENAI_KEY"),
-    api_version="2024-02-01"
-)
+try:
+    print("Initializing Azure OpenAI client...")
+    client = AzureOpenAI(
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_KEY"),
+        api_version="2024-02-01"
+    )
+except Exception as e:
+    print(f"Error initializing Azure OpenAI client: {e}")
 
 # Azure Cosmos DB Client
-cosmos_client = CosmosClient(os.getenv("COSMOS_URL"), os.getenv("COSMOS_KEY"))
-database = cosmos_client.get_database_client("ChekElDB")
-scores_container = database.get_container_client("Scores")
-notes_container = database.get_container_client("Notes")
+try:
+    print("Initializing Cosmos DB client...")
+    cosmos_client = CosmosClient(os.getenv("COSMOS_URL"), os.getenv("COSMOS_KEY"))
+    database = cosmos_client.get_database_client("ChekElDB")
+    scores_container = database.get_container_client("Scores")
+    notes_container = database.get_container_client("Notes")
+except Exception as e:
+    print(f"Error initializing Cosmos DB client: {e}")
 
 # Azure AI Search Client
-search_client = SearchClient(os.getenv("SEARCH_ENDPOINT"), "notes-index", AzureKeyCredential(os.getenv("SEARCH_KEY")))
+try:
+    print("Initializing Azure AI Search client...")
+    search_client = SearchClient(os.getenv("SEARCH_ENDPOINT"), "notes-index", AzureKeyCredential(os.getenv("SEARCH_KEY")))
+except Exception as e:
+    print(f"Error initializing Azure AI Search client: {e}")
 
 # Serve multiple pages
 @app.route('/')
@@ -127,34 +159,14 @@ def save_score():
     except Exception as e:
         return jsonify({"status": f"Error: {str(e)}"}), 500
 
-@app.route('/api/text-to-speech', methods=['POST'])
-def text_to_speech():
-    data = request.get_json()
-    text = data.get('text')
-    try:
-        speech_config = SpeechConfig(subscription=os.getenv("SPEECH_KEY"), region=os.getenv("SPEECH_REGION"))
-        audio_config = AudioOutputConfig(filename="output.wav")
-        synthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
-        synthesizer.speak_text_async(text).get()
-        with open("output.wav", "rb") as audio_file:
-            audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
-        return jsonify({"audio": audio_data})
-    except Exception as e:
-        return jsonify({"error": f"Error: {str(e)}"}), 500
+# Temporarily disabled speech endpoints due to SDK issues
+# @app.route('/api/text-to-speech', methods=['POST'])
+# def text_to_speech():
+#     return jsonify({"error": "Text-to-speech temporarily disabled"}), 503
 
-@app.route('/api/speech-to-text', methods=['POST'])
-def speech_to_text():
-    audio_file = request.files['audio']
-    audio_file.save('input.wav')
-    try:
-        speech_config = SpeechConfig(subscription=os.getenv("SPEECH_KEY"), region=os.getenv("SPEECH_REGION"))
-        with wave.open('input.wav', 'rb') as wav_file:
-            audio_input = AudioInputStream(wav_file)
-            recognizer = SpeechRecognizer(speech_config=speech_config, audio_config=audio_input)
-            result = recognizer.recognize_once_async().get()
-            return jsonify({"text": result.text if result.text else ""})
-    except Exception as e:
-        return jsonify({"error": f"Error: {str(e)}"}), 500
+# @app.route('/api/speech-to-text', methods=['POST'])
+# def speech_to_text():
+#     return jsonify({"error": "Speech-to-text temporarily disabled"}), 503
 
 @app.route('/api/save-note', methods=['POST'])
 def save_note():
@@ -195,4 +207,5 @@ def get_notes():
         return jsonify({"error": f"Error: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
+    print("Starting Flask-SocketIO server...")
+    socketio.run(app, host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=True)
