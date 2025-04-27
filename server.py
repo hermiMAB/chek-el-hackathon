@@ -29,14 +29,15 @@ try:
     from azure.cosmos import CosmosClient
     from azure.search.documents import SearchClient
     from azure.core.credentials import AzureKeyCredential
+    import azure.cognitiveservices.speech as speechsdk
 except Exception as e:
     print(f"Error importing Azure dependencies: {e}")
 
 print("Initializing Flask app...")
 app = Flask(__name__, static_folder='public', static_url_path='')
-app.config['SECRET_KEY'] = 'secret!'  # Required for SocketIO sessions
+app.config['SECRET_KEY'] = 'secret!'
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")  # Initialize SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading', transports=['polling'])
 
 # Azure OpenAI Client
 try:
@@ -53,9 +54,42 @@ except Exception as e:
 try:
     print("Initializing Cosmos DB client...")
     cosmos_client = CosmosClient(os.getenv("COSMOS_URL"), os.getenv("COSMOS_KEY"))
-    database = cosmos_client.get_database_client("ChekElDB")
-    scores_container = database.get_container_client("Scores")
-    notes_container = database.get_container_client("Notes")
+    
+    # Create or get database
+    database_name = "CheckElDB"
+    try:
+        database = cosmos_client.create_database_if_not_exists(id=database_name)
+        print(f"Database '{database_name}' created or already exists.")
+    except Exception as e:
+        print(f"Error creating database: {e}")
+        raise e
+
+    # Create or get Scores container
+    scores_container_name = "Scores"
+    try:
+        scores_container = database.create_container_if_not_exists(
+            id=scores_container_name,
+            partition_key={"paths": ["/id"], "kind": "Hash"},
+            offer_throughput=400
+        )
+        print(f"Container '{scores_container_name}' created or already exists.")
+    except Exception as e:
+        print(f"Error creating Scores container: {e}")
+        raise e
+
+    # Create or get Notes container
+    notes_container_name = "Notes"
+    try:
+        notes_container = database.create_container_if_not_exists(
+            id=notes_container_name,
+            partition_key={"paths": ["/id"], "kind": "Hash"},
+            offer_throughput=400
+        )
+        print(f"Container '{notes_container_name}' created or already exists.")
+    except Exception as e:
+        print(f"Error creating Notes container: {e}")
+        raise e
+
 except Exception as e:
     print(f"Error initializing Cosmos DB client: {e}")
 
@@ -137,36 +171,83 @@ def save_score():
     points = data.get('points')
     quiz_count = data.get('quiz_count')
     try:
+        print(f"Attempting to save score for user_id: {user_id}, points: {points}, quiz_count: {quiz_count}")
         scores_container.upsert_item({
             'id': user_id,
             'points': points,
             'quiz_count': quiz_count
         })
-        # Calculate badges
+        print("Score saved successfully")
         badges = []
         if points >= 30:
             badges.append("Quiz Novice")
         if points >= 90:
             badges.append("Quiz Master")
-        # Broadcast gamification update
+        # Emit to all connected clients using namespace
         socketio.emit('gamification_update', {
             'user_id': user_id,
             'points': points,
             'badges': badges,
             'message': f"User {user_id[:8]} earned {points} points and {', '.join(badges) or 'no badges'}!"
-        }, broadcast=True)
+        }, namespace='/')
         return jsonify({"status": "saved", "badges": badges})
     except Exception as e:
+        print(f"Cosmos DB error in save_score: {str(e)}")
         return jsonify({"status": f"Error: {str(e)}"}), 500
 
-# Temporarily disabled speech endpoints due to SDK issues
-# @app.route('/api/text-to-speech', methods=['POST'])
-# def text_to_speech():
-#     return jsonify({"error": "Text-to-speech temporarily disabled"}), 503
+# Text-to-Speech
+@app.route('/api/text-to-speech', methods=['POST'])
+def text_to_speech():
+    try:
+        data = request.get_json()
+        text = data.get('text')
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
 
-# @app.route('/api/speech-to-text', methods=['POST'])
-# def speech_to_text():
-#     return jsonify({"error": "Speech-to-text temporarily disabled"}), 503
+        speech_config = speechsdk.SpeechConfig(
+            subscription=os.getenv("SPEECH_KEY"),
+            region=os.getenv("SPEECH_REGION")
+        )
+        speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
+        synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
+        result = synthesizer.speak_text_async(text).get()
+        
+        if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+            audio_data = result.audio_data
+            audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+            return jsonify({"audio": audio_base64})
+        else:
+            return jsonify({"error": "Text-to-speech synthesis failed"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+
+# Speech-to-Text
+@app.route('/api/speech-to-text', methods=['POST'])
+def speech_to_text():
+    try:
+        audio_file = request.files['audio']
+        if not audio_file:
+            return jsonify({"error": "No audio file provided"}), 400
+
+        speech_config = speechsdk.SpeechConfig(
+            subscription=os.getenv("SPEECH_KEY"),
+            region=os.getenv("SPEECH_REGION")
+        )
+        audio_config = speechsdk.audio.AudioConfig(stream=speechsdk.audio.PushAudioInputStream())
+        recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
+        stream = speechsdk.audio.PushAudioInputStream()
+        audio_data = audio_file.read()
+        stream.write(audio_data)
+        stream.close()
+
+        result = recognizer.recognize_once()
+        if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+            return jsonify({"text": result.text})
+        else:
+            return jsonify({"error": "Speech-to-text failed"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
 
 @app.route('/api/save-note', methods=['POST'])
 def save_note():
@@ -208,4 +289,4 @@ def get_notes():
 
 if __name__ == '__main__':
     print("Starting Flask-SocketIO server...")
-    socketio.run(app, host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=True)
+    socketio.run(app, host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=False)
