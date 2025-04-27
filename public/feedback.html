@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chek El - Feedback</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <h1>Chek El</h1>
+        <nav>
+            <a href="/welcome">Welcome</a>
+            <a href="/ask-ai">Ask AI</a>
+            <a href="/quiz">Quiz</a>
+            <a href="/feedback">Feedback</a>
+            <a href="/learning-planner">Learning Planner</a>
+            <a href="#" onclick="logout()">Log Out</a>
+        </nav>
+    </header>
+    <div class="container">
+        <h2>Feedback</h2>
+        <textarea id="feedback" placeholder="Enter your feedback..."></textarea>
+        <button onclick="saveFeedback()">Submit Feedback</button>
+        <p id="message"></p>
+    </div>
+    <script>
+        async function saveFeedback() {
+            const feedback = document.getElementById('feedback').value;
+            const response = await fetch('/api/save-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feedback })
+            });
+            const data = await response.json();
+            document.getElementById('message').innerText = data.status === 'saved' ? 'Feedback submitted!' : data.error;
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>

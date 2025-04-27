@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chek El - Community</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Chek El</h1>
+        <nav>
+            <a href="/welcome">Welcome</a>
+            <a href="/ask-ai">Ask AI</a>
+            <a href="/quiz">Quiz</a>
+            <a href="/community">Community</a>
+            <a href="/feedback">Feedback</a>
+            <a href="/learning-planner">Learning Planner</a>
+            <a href="#" onclick="logout()">Log Out</a>
+        </nav>
+    </header>
+    <div class="container">
+        <div id="auth-section">
+            <h2>Please Log In or Register</h2>
+            <input id="username" placeholder="Username" required>
+            <input id="password" type="password" placeholder="Password" required>
+            <button onclick="login()">Login</button>
+            <button onclick="register()">Register</button>
+            <p id="auth-error" style="color: red;"></p>
+        </div>
+        <div id="community-section" style="display: none;">
+            <h2>Our Community</h2>
+            <p>Welcome to the Chek El community! Our members, including our AI assistant, work together to enhance learning and collaboration.</p>
+            <div class="member-list">
+                <div class="member">
+                    <h3>Chek El AI</h3>
+                    <p><strong>Role:</strong> Knowledge Assistant</p>
+                    <p><strong>About:</strong> I'm Chek El AI, powered by Azure OpenAI. I generate quizzes, answer questions, provide explanations, and summarize our community chat to keep you informed!</p>
+                </div>
+                <div class="member">
+                    <h3>Alice Learner</h3>
+                    <p><strong>Role:</strong> Student</p>
+                    <p><strong>About:</strong> Alice is a curious student passionate about history and science. She uses Chek El to deepen her understanding through quizzes and AI-driven insights.</p>
+                </div>
+                <div class="member">
+                    <h3>Bob Educator</h3>
+                    <p><strong>Role:</strong> Teacher</p>
+                    <p><strong>About:</strong> Bob is an educator who leverages Chek El to create engaging learning plans and quiz his students, with support from the AI's vast knowledge.</p>
+                </div>
+                <div class="member">
+                    <h3>Carol Researcher</h3>
+                    <p><strong>Role:</strong> Academic</p>
+                    <p><strong>About:</strong> Carol uses Chek El to explore complex topics and validate her research with AI-generated explanations and resources.</p>
+                </div>
+            </div>
+            <div id="community-chat">
+                <h3>Community Chat</h3>
+                <div id="chat-messages"></div>
+                <input id="chat-input" placeholder="Type your message..." required>
+                <button onclick="sendMessage()">Send</button>
+                <button onclick="summarizeChat()">Summarize Chat</button>
+                <div id="chat-summary" style="margin-top: 20px;"></div>
+                <p id="chat-error" style="color: red;"></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        const socket = io();
+        let currentUsername = '';
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-auth');
+                const data = await response.json();
+                if (data.authenticated) {
+                    document.getElementById('auth-section').style.display = 'none';
+                    document.getElementById('community-section').style.display = 'block';
+                    // Fetch username
+                    const userResponse = await fetch('/api/get-username', {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const userData = await userResponse.json();
+                    if (userData.username) {
+                        currentUsername = userData.username;
+                        loadChatMessages();
+                    }
+                } else {
+                    document.getElementById('auth-section').style.display = 'block';
+                    document.getElementById('community-section').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking auth:', error);
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('auth-error');
+            if (!username || !password) {
+                errorDiv.innerText = 'Please enter both username and password';
+                return;
+            }
+            try {
+                errorDiv.innerText = '';
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    checkAuth();
+                } else {
+                    errorDiv.innerText = data.error || 'Login failed';
+                }
+            } catch (error) {
+                errorDiv.innerText = 'An error occurred. Please try again.';
+                console.error('Error in login:', error);
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('auth-error');
+            if (!username || !password) {
+                errorDiv.innerText = 'Please enter both username and password';
+                return;
+            }
+            try {
+                errorDiv.innerText = '';
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (data.status === 'User registered') {
+                    alert('Registration successful! Please log in.');
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                } else {
+                    errorDiv.innerText = data.error || 'Registration failed';
+                }
+            } catch (error) {
+                errorDiv.innerText = 'An error occurred. Please try again.';
+                console.error('Error in register:', error);
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error in logout:', error);
+            }
+        }
+
+        async function loadChatMessages() {
+            try {
+                const response = await fetch('/api/community-chat');
+                const data = await response.json();
+                if (data.messages) {
+                    const messagesDiv = document.getElementById('chat-messages');
+                    messagesDiv.innerHTML = data.messages.map(msg => `
+                        <div class="chat-message">
+                            <strong>${msg.username}</strong> (${new Date(msg.timestamp).toLocaleString()}): ${msg.message}
+                        </div>
+                    `).join('');
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                } else {
+                    document.getElementById('chat-error').innerText = data.error || 'Failed to load messages';
+                }
+            } catch (error) {
+                document.getElementById('chat-error').innerText = 'Error loading messages';
+                console.error('Error in loadChatMessages:', error);
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            const errorDiv = document.getElementById('chat-error');
+            if (!message) {
+                errorDiv.innerText = 'Please enter a message';
+                return;
+            }
+            if (!currentUsername) {
+                errorDiv.innerText = 'User not authenticated';
+                return;
+            }
+            socket.emit('message', { username: currentUsername, message });
+            input.value = '';
+            errorDiv.innerText = '';
+        }
+
+        socket.on('response', (data) => {
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.innerHTML += `
+                <div class="chat-message">
+                    <strong>${data.username}</strong> (${new Date().toLocaleString()}): ${data.message}
+                </div>
+            `;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+
+        async function summarizeChat() {
+            try {
+                const response = await fetch('/api/summarize-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                const summaryDiv = document.getElementById('chat-summary');
+                if (data.summary) {
+                    summaryDiv.innerHTML = `<h4>Chat Summary</h4><p>${data.summary}</p>`;
+                } else {
+                    document.getElementById('chat-error').innerText = data.error || 'Failed to summarize chat';
+                }
+            } catch (error) {
+                document.getElementById('chat-error').innerText = 'Error summarizing chat';
+                console.error('Error in summarizeChat:', error);
+            }
+        }
+
+        window.onload = checkAuth;
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chek El - Learning Planner</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <h1>Chek El</h1>
+        <nav>
+            <a href="/welcome">Welcome</a>
+            <a href="/ask-ai">Ask AI</a>
+            <a href="/quiz">Quiz</a>
+            <a href="/feedback">Feedback</a>
+            <a href="/learning-planner">Learning Planner</a>
+            <a href="#" onclick="logout()">Log Out</a>
+        </nav>
+    </header>
+    <div class="container">
+        <h2>Learning Planner</h2>
+        <input id="topic" placeholder="Enter topic">
+        <input id="end-date" type="date" placeholder="End date">
+        <select id="complexity">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+        </select>
+        <button onclick="createLearningPlan()">Create Plan</button>
+        <p id="message"></p>
+    </div>
+    <script>
+        async function createLearningPlan() {
+            const topic = document.getElementById('topic').value;
+            const endDate = document.getElementById('end-date').value;
+            const complexity = document.getElementById('complexity').value;
+            const response = await fetch('/api/create-learning-plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, end_date: endDate, complexity })
+            });
+            const data = await response.json();
+            document.getElementById('message').innerText = data.status === 'saved' ? 'Learning plan created!' : data.error;
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>

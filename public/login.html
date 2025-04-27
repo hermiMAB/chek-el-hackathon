@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chek El - Login</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <h1>Chek El</h1>
+        <nav>
+            <a href="/welcome">Welcome</a>
+            <a href="/ask-ai">Ask AI</a>
+            <a href="/quiz">Quiz</a>
+            <a href="/feedback">Feedback</a>
+            <a href="/learning-planner">Learning Planner</a>
+        </nav>
+    </header>
+    <div class="container">
+        <h2>Login or Register</h2>
+        <input id="username" placeholder="Username" required>
+        <input id="password" type="password" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+        <button onclick="register()">Register</button>
+        <p id="error" style="color: red;"></p>
+    </div>
+    <script>
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (!username || !password) {
+                document.getElementById('error').innerText = 'Please enter both username and password';
+                return;
+            }
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    window.location.href = '/welcome';
+                } else {
+                    document.getElementById('error').innerText = data.error || 'Login failed';
+                }
+            } catch (error) {
+                document.getElementById('error').innerText = 'An error occurred. Please try again.';
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (!username || !password) {
+                document.getElementById('error').innerText = 'Please enter both username and password';
+                return;
+            }
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (data.status === 'User registered') {
+                    alert('Registration successful! Please log in.');
+                    document.getElementById('error').innerText = '';
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                } else {
+                    document.getElementById('error').innerText = data.error || 'Registration failed';
+                }
+            } catch (error) {
+                document.getElementById('error').innerText = 'An error occurred. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html>
