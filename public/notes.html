@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes - Chek El</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
+<<<<<<< HEAD
     <link href="/public/csses/enhanced-note.css" rel="stylesheet">
+=======
+    <link href="/css/style.css" rel="stylesheet">
+>>>>>>> 1fe68a1874709cccd1c8b225b36cd27cbb58e52f
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -188,7 +192,11 @@
         async function loadNotes() {
             try {
                 const response = await fetch('/api/get-notes', { credentials: 'include' });
+<<<<<<< HEAD
                 if (!response.ok) throw new Error(HTTP ${response.status});
+=======
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+>>>>>>> 1fe68a1874709cccd1c8b225b36cd27cbb58e52f
                 const data = await response.json();
                 const notesList = document.getElementById('notes-list');
                 notesList.innerHTML = '';
@@ -201,8 +209,13 @@
                     noteDiv.className = 'note-item';
                     noteDiv.innerHTML = `
                         <p><strong>Note:</strong> ${note.note}</p>
+<<<<<<< HEAD
                         ${note.note_style ? <p><strong>Style:</strong> ${note.note_style}</p> : ''}
                         ${note.rewritten_note ? <p><strong>Rewritten:</strong> ${note.rewritten_note}</p> : ''}
+=======
+                        ${note.note_style ? `<p><strong>Style:</strong> ${note.note_style}</p>` : ''}
+                        ${note.rewritten_note ? `<p><strong>Rewritten:</strong> ${note.rewritten_note}</p>` : ''}
+>>>>>>> 1fe68a1874709cccd1c8b225b36cd27cbb58e52f
                         <p><strong>Date:</strong> ${new Date(note.timestamp).toLocaleString()}</p>
                         <button onclick="rewriteNoteExisting('${encodeURIComponent(note.note)}', 'narrative')">Narrative</button>
                         <button onclick="rewriteNoteExisting('${encodeURIComponent(note.note)}', 'bullet_points')">Bullet Points</button>

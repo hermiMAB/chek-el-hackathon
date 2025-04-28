@@ -161,7 +161,11 @@
                 });
 
                 if (!response.ok) {
+<<<<<<< HEAD
                     throw new Error(HTTP error! Status: ${response.status});
+=======
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+>>>>>>> 1fe68a1874709cccd1c8b225b36cd27cbb58e52f
                 }
 
                 const data = await response.json();
@@ -177,7 +181,11 @@
                     messageDiv.className = '';
                 }
             } catch (error) {
+<<<<<<< HEAD
                 messageDiv.innerText = Error: ${error.message};
+=======
+                messageDiv.innerText = `Error: ${error.message}`;
+>>>>>>> 1fe68a1874709cccd1c8b225b36cd27cbb58e52f
                 messageDiv.className = '';
                 console.error('Error in createLearningPlan:', error);
             }
@@ -192,7 +200,11 @@
                 });
 
                 if (!response.ok) {
+<<<<<<< HEAD
                     throw new Error(HTTP error! Status: ${response.status});
+=======
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+>>>>>>> 1fe68a1874709cccd1c8b225b36cd27cbb58e52f
                 }
 
                 const plans = await response.json();
@@ -204,7 +216,7 @@
                         if (plan.schedule && plan.schedule.length) {
                             subtopicsHtml = '<ul class="subtopic-list">';
                             plan.schedule.forEach(entry => {
-                                subtopicsHtml += <li>${entry.subtopic} (${new Date(entry.date).toLocaleDateString()})</li>;
+                                subtopicsHtml += `<li>${entry.subtopic} (${new Date(entry.date).toLocaleDateString()})</li>`;
                             });
                             subtopicsHtml += '</ul>';
                         } else {
@@ -224,7 +236,11 @@
                     plansDiv.innerHTML = '<p>No learning plans available</p>';
                 }
             } catch (error) {
+<<<<<<< HEAD
                 plansDiv.innerHTML = <p>Error loading plans: ${error.message}</p>;
+=======
+                plansDiv.innerHTML = `<p>Error loading plans: ${error.message}</p>`;
+>>>>>>> 1fe68a1874709cccd1c8b225b36cd27cbb58e52f
                 console.error('Error in loadPlans:', error);
             }
         }
