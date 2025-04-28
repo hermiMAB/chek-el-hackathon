@@ -768,6 +768,7 @@ def learn_subtopic():
 if __name__ == '__main__':
     try:
         logger.info("Starting Flask server...")
+        # For local development, use Flask-SocketIO
         socketio.run(app, host='0.0.0.0', port=int(os.getenv('PORT', '5000')), debug=True)
     except Exception as e:
         logger.error(f"Failed to start server: {e}")
