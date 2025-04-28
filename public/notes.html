@@ -1,0 +1,62 @@
+
+   <!DOCTYPE html>
+   <html>
+   <head>
+       <title>Notes</title>
+   </head>
+   <body>
+       <h1>Notes</h1>
+       <textarea id="noteInput" placeholder="Enter your note"></textarea>
+       <select id="noteStyle">
+           <option value="narrative">Narrative</option>
+           <option value="analogy">Analogy</option>
+           <option value="bullet_points">Bullet Points</option>
+           <option value="step_by_step">Step-by-Step</option>
+       </select>
+       <button onclick="rewriteNote()">Rewrite Note</button>
+       <button onclick="saveNote()">Save Note</button>
+       <div id="rewrittenNote"></div>
+
+       <script>
+           async function rewriteNote() {
+               const note = document.getElementById('noteInput').value;
+               const noteStyle = document.getElementById('noteStyle').value;
+               try {
+                   const response = await fetch('/api/rewrite_note', {
+                       method: 'POST',
+                       headers: { 'Content-Type': 'application/json' },
+                       body: JSON.stringify({ note, note_style: noteStyle })
+                   });
+                   const data = await response.json();
+                   if (response.ok) {
+                       document.getElementById('rewrittenNote').innerText = data.rewritten_note;
+                   } else {
+                       document.getElementById('rewrittenNote').innerText = `Error: ${data.error}`;
+                   }
+               } catch (error) {
+                   document.getElementById('rewrittenNote').innerText = `Error: ${error.message}`;
+               }
+           }
+
+           async function saveNote() {
+               const note = document.getElementById('noteInput').value;
+               const noteStyle = document.getElementById('noteStyle').value;
+               try {
+                   const response = await fetch('/api/save-note', {
+                       method: 'POST',
+                       headers: { 'Content-Type': 'application/json' },
+                       body: JSON.stringify({ note, note_style: noteStyle })
+                   });
+                   const data = await response.json();
+                   if (response.ok) {
+                       alert('Note saved successfully! Rewritten note: ' + (data.rewritten_note || 'N/A'));
+                   } else {
+                       alert('Error: ' + data.error);
+                   }
+               } catch (error) {
+                   alert('Error: ' + error.message);
+               }
+           }
+       </script>
+   </body>
+   </html>
