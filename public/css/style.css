@@ -1,0 +1,100 @@
+/* NiceAdmin-inspired Blue and White Theme for Chek El */
+:root {
+    --bs-primary: #2935a0; /* NiceAdmin blue */
+    --bs-secondary: #f6f9ff; /* Light blue-white background */
+    --bs-white: #fff;
+    --bs-gray: #5a5c69;
+    --bs-font-sans-serif: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --bs-body-bg: var(--bs-secondary);
+    --bs-body-color: var(--bs-gray);
+  }
+  
+  body {
+    font-family: var(--bs-font-sans-serif);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+  }
+  
+  /* Navbar */
+  .navbar {
+    background-color: var(--bs-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-brand, .nav-link {
+    color: var(--bs-white) !important;
+  }
+  
+  .nav-link:hover {
+    color: #d0d4ff !important;
+  }
+  
+  /* Cards for Community Members */
+  .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .card-img-top {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .card-title {
+    color: var(--bs-primary);
+    font-weight: 700;
+  }
+  
+  .card-text {
+    color: var(--bs-gray);
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    border-radius: 5px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2f3eb1;
+    border-color: #2f3eb1;
+  }
+  
+  /* Footer */
+  footer {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 40px;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .card {
+      margin-bottom: 20px;
+    }
+  }
+  
+  /* Quiz Page Styling */
+  .quiz-container {
+    background-color: var(--bs-white);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .quiz-container h2 {
+    color: var(--bs-primary);
+  }

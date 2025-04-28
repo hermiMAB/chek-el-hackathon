@@ -1,29 +1,200 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chek El - Welcome</title>
-    <link rel="stylesheet" href="/style.css">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fa; /* Light grey background */
+            color: #212529;
+        }
+        .navbar {
+            background-color: #2935a0; /* Deep blue */
+            padding: 15px 0;
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .nav-link:hover {
+            color: #17a2b8 !important; /* Cyan hover */
+        }
+        .hero-section {
+            background: linear-gradient(180deg, #2935a0, #495057);
+            color: #fff;
+            padding: 80px 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+        .hero-section p {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff; /* White card */
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card-header {
+            background-color: #6f6f6f; /* Dark grey */
+            color: #fff;
+            border-radius: 10px 10px 0 0;
+            padding: 15px;
+            text-align: center;
+        }
+        .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+        .card-body i {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        .btn-primary {
+            background-color: #6f6f6f; /* Dark grey */
+            border-color: #6f6f6f;
+        }
+        .btn-primary:hover {
+            background-color: #17a2b8; /* Cyan hover */
+            border-color: #17a2b8;
+        }
+        footer {
+            background-color: #2935a0; /* Deep blue */
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+        a {
+            color: #007bff;
+        }
+        a:hover {
+            color: #17a2b8; /* Cyan hover */
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Chek El</h1>
-        <nav>
-            <a href="/welcome">Welcome</a>
-            <a href="/ask-ai">Ask AI</a>
-            <a href="/quiz">Quiz</a>
-            <a href="/feedback">Feedback</a>
-            <a href="/learning-planner">Learning Planner</a>
-            <a href="#" onclick="logout()">Log Out</a>
-        </nav>
-    </header>
-    <div class="container">
-        <h2>Welcome to Chek El</h2>
-        <p>Explore our features to enhance your learning experience!</p>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">Chek El</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/welcome">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ask-ai">Ask AI</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/quiz">Quiz</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/community">Community</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/feedback">Feedback</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/learning-planner">Learning Planner</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="container">
+            <h1>Welcome to Chek El</h1>
+            <p>Your ultimate platform for personalized learning and growth!</p>
+            <a href="#features" class="btn btn-primary btn-lg">Explore Features</a>
+        </div>
     </div>
+
+    <div class="container my-5" id="features">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Ask AI</h4>
+                    </div>
+                    <div class="card-body">
+                        <i class="fas fa-robot"></i>
+                        <p>Get instant answers to your questions with our AI-powered assistant.</p>
+                        <a href="/ask-ai" class="btn btn-primary">Try Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Quiz</h4>
+                    </div>
+                    <div class="card-body">
+                        <i class="fas fa-question-circle"></i>
+                        <p>Test your knowledge with customized quizzes on any topic.</p>
+                        <a href="/quiz" class="btn btn-primary">Start Quiz</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Learning Planner</h4>
+                    </div>
+                    <div class="card-body">
+                        <i class="fas fa-calendar-alt"></i>
+                        <p>Create personalized learning plans tailored to your goals.</p>
+                        <a href="/learning-planner" class="btn btn-primary">Plan Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Community</h4>
+                    </div>
+                    <div class="card-body">
+                        <i class="fas fa-users"></i>
+                        <p>Connect with learners, share ideas, and collaborate.</p>
+                        <a href="/community" class="btn btn-primary">Join Community</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Feedback</h4>
+                    </div>
+                    <div class="card-body">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>Share your thoughts to help us improve your experience.</p>
+                        <a href="/feedback" class="btn btn-primary">Give Feedback</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Chek El. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
     <script>
         async function logout() {
-            await fetch('/api/logout', { method: 'POST' });
-            window.location.href = '/login';
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error in logout:', error);
+            }
         }
     </script>
 </body>

@@ -1,42 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chek El - Feedback</title>
-    <link rel="stylesheet" href="/style.css">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fa; /* Light grey background */
+            color: #212529;
+        }
+        .navbar {
+            background-color: #2935a0; /* Deep blue */
+            padding: 15px 0;
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .nav-link:hover {
+            color: #17a2b8 !important; /* Cyan hover */
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff; /* White card */
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #6f6f6f; /* Dark grey */
+            color: #fff;
+            border-radius: 10px 10px 0 0;
+            padding: 15px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 150px;
+        }
+        .btn-primary {
+            background-color: #6f6f6f; /* Dark grey */
+            border-color: #6f6f6f;
+        }
+        .btn-primary:hover {
+            background-color: #17a2b8; /* Cyan hover */
+            border-color: #17a2b8;
+        }
+        footer {
+            background-color: #2935a0; /* Deep blue */
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+        a {
+            color: #007bff;
+        }
+        a:hover {
+            color: #17a2b8; /* Cyan hover */
+        }
+        #message {
+            color: #dc3545; /* Red for errors */
+        }
+        #message.success {
+            color: #28a745; /* Green for success */
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Chek El</h1>
-        <nav>
-            <a href="/welcome">Welcome</a>
-            <a href="/ask-ai">Ask AI</a>
-            <a href="/quiz">Quiz</a>
-            <a href="/feedback">Feedback</a>
-            <a href="/learning-planner">Learning Planner</a>
-            <a href="#" onclick="logout()">Log Out</a>
-        </nav>
-    </header>
-    <div class="container">
-        <h2>Feedback</h2>
-        <textarea id="feedback" placeholder="Enter your feedback..."></textarea>
-        <button onclick="saveFeedback()">Submit Feedback</button>
-        <p id="message"></p>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">Chek El</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/welcome">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ask-ai">Ask AI</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/quiz">Quiz</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/community">Community</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/feedback">Feedback</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/learning-planner">Learning Planner</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="card">
+            <div class="card-header">
+                <h3>Feedback</h3>
+            </div>
+            <div class="card-body">
+                <textarea id="feedback" class="form-control" placeholder="Enter your feedback..." required></textarea>
+                <button onclick="saveFeedback()" class="btn btn-primary mt-3">Submit Feedback</button>
+                <p id="message"></p>
+            </div>
+        </div>
     </div>
+
+    <footer>
+        <p>© 2025 Chek El. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
     <script>
         async function saveFeedback() {
             const feedback = document.getElementById('feedback').value;
-            const response = await fetch('/api/save-feedback', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ feedback })
-            });
-            const data = await response.json();
-            document.getElementById('message').innerText = data.status === 'saved' ? 'Feedback submitted!' : data.error;
+            const messageDiv = document.getElementById('message');
+            if (!feedback) {
+                messageDiv.innerText = 'Please enter feedback';
+                return;
+            }
+            try {
+                const response = await fetch('/api/save-feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ feedback })
+                });
+                const data = await response.json();
+                messageDiv.innerText = data.status === 'saved' ? 'Feedback submitted!' : data.error;
+                messageDiv.className = data.status === 'saved' ? 'success' : '';
+                if (data.status === 'saved') {
+                    document.getElementById('feedback').value = '';
+                }
+            } catch (error) {
+                messageDiv.innerText = 'An error occurred. Please try again.';
+                console.error('Error in saveFeedback:', error);
+            }
         }
 
         async function logout() {
-            await fetch('/api/logout', { method: 'POST' });
-            window.location.href = '/login';
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error in logout:', error);
+            }
         }
     </script>
 </body>
