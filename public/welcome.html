@@ -5,93 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chek El - Welcome</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/style.css" rel="stylesheet">
+    <link href="/public/csses/enhanced-style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #f8f9fa; /* Light grey background */
-            color: #212529;
-        }
-        .navbar {
-            background-color: #2935a0; /* Deep blue */
-            padding: 15px 0;
-        }
-        .navbar-brand, .nav-link {
-            color: #fff !important;
-        }
-        .nav-link:hover {
-            color: #17a2b8 !important; /* Cyan hover */
-        }
-        .hero-section {
-            background: linear-gradient(180deg, #2935a0, #495057);
-            color: #fff;
-            padding: 80px 0;
-            text-align: center;
-            border-radius: 0 0 20px 20px;
-        }
-        .hero-section h1 {
-            font-size: 3rem;
-            font-weight: 700;
-        }
-        .hero-section p {
-            font-size: 1.25rem;
-            margin-bottom: 20px;
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #ffffff; /* White card */
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-        .card:hover {
-            transform: scale(1.05);
-        }
-        .card-header {
-            background-color: #6f6f6f; /* Dark grey */
-            color: #fff;
-            border-radius: 10px 10px 0 0;
-            padding: 15px;
-            text-align: center;
-        }
-        .card-body {
-            padding: 20px;
-            text-align: center;
-        }
-        .card-body i {
-            font-size: 2rem;
-            color: #007bff;
-            margin-bottom: 15px;
-        }
-        .btn-primary {
-            background-color: #6f6f6f; /* Dark grey */
-            border-color: #6f6f6f;
-        }
-        .btn-primary:hover {
-            background-color: #17a2b8; /* Cyan hover */
-            border-color: #17a2b8;
-        }
-        footer {
-            background-color: #2935a0; /* Deep blue */
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-            margin-top: 40px;
-        }
-        a {
-            color: #007bff;
-        }
-        a:hover {
-            color: #17a2b8; /* Cyan hover */
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="/">Chek El</a>
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-sparkles me-2"></i>
+                Chek El
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -111,13 +35,17 @@
 
     <div class="hero-section">
         <div class="container">
-            <h1>Welcome to Chek El</h1>
-            <p>Your ultimate platform for personalized learning and growth!</p>
-            <a href="#features" class="btn btn-primary btn-lg">Explore Features</a>
+            <h1>Welcome to <span style="background: linear-gradient(to right, #67e8f9, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Chek El</span></h1>
+            <p>LOCK IN. LEVEL UP.</p>
+            <a href="#features" class="btn btn-primary btn-lg">
+                Explore Features
+                <i class="fas fa-chevron-right ms-2"></i>
+            </a>
         </div>
     </div>
 
     <div class="container my-5" id="features">
+        <h2>Our Features</h2>
         <div class="row">
             <div class="col-md-4">
                 <div class="card">

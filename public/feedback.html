@@ -5,135 +5,473 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chek El - Feedback</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/style.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #f8f9fa; /* Light grey background */
-            color: #212529;
-        }
-        .navbar {
-            background-color: #2935a0; /* Deep blue */
-            padding: 15px 0;
-        }
-        .navbar-brand, .nav-link {
-            color: #fff !important;
-        }
-        .nav-link:hover {
-            color: #17a2b8 !important; /* Cyan hover */
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #ffffff; /* White card */
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background-color: #6f6f6f; /* Dark grey */
-            color: #fff;
-            border-radius: 10px 10px 0 0;
-            padding: 15px;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        textarea.form-control {
-            resize: vertical;
-            min-height: 150px;
-        }
-        .btn-primary {
-            background-color: #6f6f6f; /* Dark grey */
-            border-color: #6f6f6f;
-        }
-        .btn-primary:hover {
-            background-color: #17a2b8; /* Cyan hover */
-            border-color: #17a2b8;
-        }
-        footer {
-            background-color: #2935a0; /* Deep blue */
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-            margin-top: 40px;
-        }
-        a {
-            color: #007bff;
-        }
-        a:hover {
-            color: #17a2b8; /* Cyan hover */
-        }
-        #message {
-            color: #dc3545; /* Red for errors */
-        }
-        #message.success {
-            color: #28a745; /* Green for success */
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/public/csses/enhanced-feedback.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="/">Chek El</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/welcome">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/ask-ai">Ask AI</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/quiz">Quiz</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/community">Community</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/feedback">Feedback</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/learning-planner">Learning Planner</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
-                </ul>
+    <div class="page-wrapper">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    Chek El
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="/welcome">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/ask-ai">Ask AI</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/quiz">Quiz</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/notes">Quiz</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/community">Community</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="/feedback">Feedback</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/learning-planner">Learning Planner</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt me-1"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <div class="container my-5">
-        <div class="card">
-            <div class="card-header">
-                <h3>Feedback</h3>
-            </div>
-            <div class="card-body">
-                <textarea id="feedback" class="form-control" placeholder="Enter your feedback..." required></textarea>
-                <button onclick="saveFeedback()" class="btn btn-primary mt-3">Submit Feedback</button>
-                <p id="message"></p>
+        <div class="page-header">
+            <div class="container">
+                <h1>
+                    <i class="fas fa-comment-dots me-2"></i>
+                    Share Your Feedback
+                </h1>
+                <p>Your thoughts help us improve and create a better learning experience for everyone</p>
             </div>
         </div>
+
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card feedback-card">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-pencil-alt me-2"></i>
+                                <h3>Write Your Feedback</h3>
+                            </div>
+                            <button class="btn-icon" title="View FAQs" onclick="toggleFAQModal()">
+                                <i class="fas fa-question-circle"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="feedback-categories mb-4">
+                                <h4>What would you like to give feedback about?</h4>
+                                <div class="category-buttons">
+                                    <button class="category-btn active" data-category="general">
+                                        <i class="fas fa-star"></i>
+                                        General
+                                    </button>
+                                    <button class="category-btn" data-category="ai">
+                                        <i class="fas fa-robot"></i>
+                                        AI Assistant
+                                    </button>
+                                    <button class="category-btn" data-category="quiz">
+                                        <i class="fas fa-question-circle"></i>
+                                        Quizzes
+                                    </button>
+                                    <button class="category-btn" data-category="ui">
+                                        <i class="fas fa-desktop"></i>
+                                        User Interface
+                                    </button>
+                                </div>
+                                <input type="hidden" id="selected-category" value="general">
+                            </div>
+
+                            <div class="feedback-rating mb-4">
+                                <h4>How would you rate your experience?</h4>
+                                <div class="rating-stars">
+                                    <i class="fas fa-star rating-star" data-rating="1"></i>
+                                    <i class="fas fa-star rating-star" data-rating="2"></i>
+                                    <i class="fas fa-star rating-star" data-rating="3"></i>
+                                    <i class="fas fa-star rating-star" data-rating="4"></i>
+                                    <i class="fas fa-star rating-star" data-rating="5"></i>
+                                </div>
+                                <input type="hidden" id="selected-rating" value="0">
+                                <p class="rating-text">Select a rating</p>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="feedback" class="form-label">Your Feedback</label>
+                                <textarea id="feedback" class="form-control" placeholder="Tell us what you think. Your feedback helps us improve..." rows="5" required></textarea>
+                                <div class="char-counter">
+                                    <span class="char-count">0/500 characters</span>
+                                    <div class="char-progress">
+                                        <div class="char-progress-bar" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="contact-me">
+                                    <label class="form-check-label" for="contact-me">
+                                        I'd like to be contacted about my feedback
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="collapsible-section mb-4">
+                                <button class="collapsible-btn" onclick="toggleCollapsible(this)">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Why Your Feedback Matters
+                                    <i class="fas fa-chevron-down collapsible-icon"></i>
+                                </button>
+                                <div class="collapsible-content">
+                                    <div class="info-item">
+                                        <div class="info-icon">
+                                            <i class="fas fa-lightbulb"></i>
+                                        </div>
+                                        <div class="info-content">
+                                            <h4>Improve Our Platform</h4>
+                                            <p>Your feedback helps us identify areas where we can enhance the learning experience.</p>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-icon">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div class="info-content">
+                                            <h4>Build Community</h4>
+                                            <p>Your insights help us create a better environment for all learners.</p>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-icon">
+                                            <i class="fas fa-rocket"></i>
+                                        </div>
+                                        <div class="info-content">
+                                            <h4>Shape the Future</h4>
+                                            <p>Your suggestions directly influence our development roadmap.</p>
+                                        </div>
+                                    </div>
+                                    <div class="testimonial">
+                                        <div class="testimonial-quote">
+                                            <i class="fas fa-quote-left"></i>
+                                            <p>Thanks to user feedback, we've implemented over 50 new features in the past year!</p>
+                                            <i class="fas fa-quote-right"></i>
+                                        </div>
+                                        <div class="testimonial-author">
+                                            <div class="testimonial-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div class="testimonial-name">The Chek El Team</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button onclick="saveFeedback()" class="btn btn-primary submit-btn">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Submit Feedback
+                                </button>
+                            </div>
+                            
+                            <div id="message" class="feedback-message"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Modal -->
+        <div id="faq-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-question-circle me-2"></i> Frequently Asked Questions</h3>
+                    <button class="btn-icon" onclick="toggleFAQModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    How is my feedback used?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Your feedback is reviewed by our team and used to prioritize improvements and new features. We take all feedback seriously and use it to make Chek El better for everyone.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Will I receive a response to my feedback?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    If you check the "I'd like to be contacted" box, a member of our team may reach out to discuss your feedback in more detail. Due to volume, we can't respond to every submission, but we read them all.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    How can I report a technical issue?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    For technical issues, please provide as much detail as possible in your feedback, including what you were doing when the issue occurred, any error messages, and what device/browser you were using.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>© 2025 Chek El. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
-    <footer>
-        <p>© 2025 Chek El. All rights reserved.</p>
-    </footer>
+    <div class="toast-container"></div>
 
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Category buttons
+            document.querySelectorAll('.category-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    document.getElementById('selected-category').value = this.dataset.category;
+                });
+            });
+
+            // Rating stars
+            document.querySelectorAll('.rating-star').forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    document.getElementById('selected-rating').value = rating;
+
+                    document.querySelectorAll('.rating-star').forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+
+                    const ratingText = document.querySelector('.rating-text');
+                    const ratingMessages = [
+                        'Select a rating',
+                        'Poor - Needs significant improvement',
+                        'Fair - Has some issues to address',
+                        'Good - Meets expectations',
+                        'Very Good - Exceeds expectations',
+                        'Excellent - Outstanding experience'
+                    ];
+                    ratingText.textContent = ratingMessages[rating];
+                });
+
+                star.addEventListener('mouseenter', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    document.querySelectorAll('.rating-star').forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('hover');
+                        } else {
+                            s.classList.remove('hover');
+                        }
+                    });
+                });
+
+                star.addEventListener('mouseleave', function() {
+                    document.querySelectorAll('.rating-star').forEach(s => {
+                        s.classList.remove('hover');
+                    });
+                });
+            });
+
+            // Character counter and progress bar
+            const feedbackTextarea = document.getElementById('feedback');
+            const charCount = document.querySelector('.char-count');
+            const charProgressBar = document.querySelector('.char-progress-bar');
+
+            feedbackTextarea.addEventListener('input', function() {
+                const count = this.value.length;
+                charCount.textContent = `${count}/500 characters`;
+
+                const percentage = (count / 500) * 100;
+                charProgressBar.style.width = `${percentage}%`;
+
+                if (count > 500) {
+                    charProgressBar.classList.add('over-limit');
+                    this.value = this.value.substring(0, 500);
+                    charCount.textContent = '500/500 characters';
+                    charProgressBar.style.width = '100%';
+                } else {
+                    charProgressBar.classList.remove('over-limit');
+                }
+            });
+        });
+
         async function saveFeedback() {
-            const feedback = document.getElementById('feedback').value;
+            const feedbackText = document.getElementById('feedback').value;
+            const category = document.getElementById('selected-category').value;
+            const rating = document.getElementById('selected-rating').value;
+            const contactMe = document.getElementById('contact-me').checked;
             const messageDiv = document.getElementById('message');
-            if (!feedback) {
-                messageDiv.innerText = 'Please enter feedback';
+
+            if (!feedbackText) {
+                showMessage(messageDiv, 'Please enter your feedback', 'error');
                 return;
             }
+
+            if (rating === '0') {
+                showMessage(messageDiv, 'Please select a rating', 'error');
+                return;
+            }
+
             try {
+                const submitBtn = document.querySelector('.submit-btn');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Submitting...';
+                submitBtn.disabled = true;
+
                 const response = await fetch('/api/save-feedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ feedback })
+                    body: JSON.stringify({ 
+                        feedback: feedbackText,
+                        category,
+                        rating,
+                        contactMe
+                    })
                 });
+
                 const data = await response.json();
-                messageDiv.innerText = data.status === 'saved' ? 'Feedback submitted!' : data.error;
-                messageDiv.className = data.status === 'saved' ? 'success' : '';
+
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+
                 if (data.status === 'saved') {
+                    showMessage(messageDiv, 'Thank you for your feedback! Your input helps us improve.', 'success');
+                    showToast('Feedback submitted successfully!', 'success');
+
                     document.getElementById('feedback').value = '';
+                    document.getElementById('selected-rating').value = '0';
+                    document.getElementById('contact-me').checked = false;
+                    document.querySelectorAll('.rating-star').forEach(s => {
+                        s.classList.remove('active');
+                    });
+                    document.querySelector('.rating-text').textContent = 'Select a rating';
+                    document.querySelector('.char-count').textContent = '0/500 characters';
+                    document.querySelector('.char-progress-bar').style.width = '0%';
+                } else {
+                    showMessage(messageDiv, data.error || 'An error occurred while submitting feedback', 'error');
+                    showToast('Failed to submit feedback', 'error');
                 }
             } catch (error) {
-                messageDiv.innerText = 'An error occurred. Please try again.';
+                const submitBtn = document.querySelector('.submit-btn');
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Submit Feedback';
+                submitBtn.disabled = false;
+
+                showMessage(messageDiv, 'An error occurred. Please try again.', 'error');
+                showToast('Failed to submit feedback', 'error');
                 console.error('Error in saveFeedback:', error);
             }
+        }
+
+        function toggleCollapsible(button) {
+            const content = button.nextElementSibling;
+            content.classList.toggle('active');
+            const icon = button.querySelector('.collapsible-icon');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        }
+
+        function toggleFAQModal() {
+            const modal = document.getElementById('faq-modal');
+            modal.classList.toggle('active');
+        }
+
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = 'feedback-message';
+            element.classList.add(type);
+            element.style.display = 'block';
+
+            element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            element.classList.add('animate-in');
+
+            setTimeout(() => {
+                element.classList.remove('animate-in');
+            }, 500);
+
+            if (type === 'error') {
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container';
+                document.body.appendChild(toastContainer);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            if (type === 'info') icon = 'info-circle';
+
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="toast-message">${message}</div>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toastContainer.removeChild(toast);
+                }, 300);
+            }, 3000);
         }
 
         async function logout() {
@@ -142,6 +480,7 @@
                 window.location.href = '/login';
             } catch (error) {
                 console.error('Error in logout:', error);
+                showToast('Logout failed', 'error');
             }
         }
     </script>

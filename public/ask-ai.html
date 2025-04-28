@@ -5,220 +5,303 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chek El - Ask AI</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/style.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #f8f9fa; /* Light grey background */
-            color: #212529;
-        }
-        .navbar {
-            background-color: #2935a0; /* Deep blue */
-            padding: 15px 0;
-        }
-        .navbar-brand, .nav-link {
-            color: #fff !important;
-        }
-        .nav-link:hover {
-            color: #17a2b8 !important; /* Cyan hover */
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #ffffff; /* White card */
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background-color: #6f6f6f; /* Lighter grey */
-            color: #fff;
-            border-radius: 10px 10px 0 0;
-            padding: 15px;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        .chat-container, .notes-container, .learning-plan-container {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .chat-message.user {
-            background-color: #007bff; /* Blue for user */
-            color: #fff;
-            text-align: right;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 5px 10px;
-            max-width: 70%;
-            margin-left: auto;
-        }
-        .chat-message.ai {
-            background-color: #e9ecef; /* Light grey for AI */
-            color: #212529;
-            text-align: left;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 5px 10px;
-            max-width: 70%;
-        }
-        .chat-message.other {
-            background-color: #d1d4d7; /* Mid-grey for others */
-            color: #212529;
-            text-align: left;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 5px 10px;
-            max-width: 70%;
-        }
-        .form-control {
-            margin-bottom: 15px;
-        }
-        .btn-primary {
-            background-color: #6f6f6f; /* Lighter grey */
-            border-color: #6f6f6f;
-        }
-        .btn-primary:hover {
-            background-color: #17a2b8; /* Cyan hover */
-            border-color: #17a2b8;
-        }
-        .btn-secondary {
-            background-color: #6c757d; /* Medium grey */
-            border-color: #6c757d;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #545b62;
-        }
-        footer {
-            background-color: #2935a0; /* Deep blue */
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-            margin-top: 40px;
-        }
-        a {
-            color: #007bff;
-        }
-        a:hover {
-            color: #17a2b8; /* Cyan hover */
-        }
-        #error {
-            color: #dc3545; /* Red for errors */
-        }
-        .learning-plan-content {
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/public/csses/enhanced-ask-ai.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="/">Chek El</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/welcome">Home</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/ask-ai">Ask AI</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/quiz">Quiz</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/community">Community</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/feedback">Feedback</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/learning-planner">Learning Planner</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
-                </ul>
+    <div class="page-wrapper">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    Chek El
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="/welcome">Home</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="/ask-ai">Ask AI</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/quiz">Quiz</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/community">Community</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/feedback">Feedback</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/learning-planner">Learning Planner</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt me-1"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <div class="container my-5">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Ask AI</h3>
+        <div class="page-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h3>Tools</h3>
+                </div>
+                <div class="sidebar-menu">
+                    <button class="sidebar-btn" onclick="togglePanel('community-chat-panel')">
+                        <i class="fas fa-users me-2"></i>
+                        Community Chat
+                    </button>
+                    <button class="sidebar-btn" onclick="togglePanel('notes-panel')">
+                        <i class="fas fa-sticky-note me-2"></i>
+                        Notes
+                    </button>
+                    <button class="sidebar-btn" onclick="togglePanel('learning-plan-panel')">
+                        <i class="fas fa-calendar-day me-2"></i>
+                        Study Plan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="page-header">
+                    <div class="container">
+                        <h1>
+                            <i class="fas fa-robot me-2"></i>
+                            Ask AI
+                        </h1>
+                        <p>Get instant answers to your questions and enhance your learning experience</p>
                     </div>
-                    <div class="card-body">
-                        <div id="chat" class="chat-container"></div>
-                        <textarea id="user-input" class="form-control" placeholder="Ask a question..."></textarea>
-                        <button onclick="sendMessage()" class="btn btn-primary mt-3">Send</button>
-                        <p id="error"></p>
+                </div>
+
+                <div class="container my-4">
+                    <div class="card chat-card">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-robot me-2"></i>
+                                <h3>Ask AI</h3>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon" title="Clear chat" onclick="clearChat('chat')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="chat" class="chat-container">
+                                <div class="chat-welcome">
+                                    <div class="chat-welcome-icon">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <h4>Hello! How can I help you today?</h4>
+                                    <p>Ask me anything about your studies or learning journey.</p>
+                                </div>
+                            </div>
+                            <div class="chat-input-container">
+                                <textarea id="user-input" class="form-control" placeholder="Ask a question..."></textarea>
+                                <button onclick="sendMessage()" class="btn btn-primary send-btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <p id="error" class="error-message"></p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Community Chat</h3>
+
+            <!-- Panels -->
+            <div id="community-chat-panel" class="panel">
+                <div class="panel-content">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-users me-2"></i> Community Chat</h3>
+                        <button class="btn-icon" onclick="togglePanel('community-chat-panel')">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-                    <div class="card-body">
-                        <div id="community-chat" class="chat-container"></div>
-                        <textarea id="community-input" class="form-control" placeholder="Share with the community..."></textarea>
-                        <button onclick="sendCommunityMessage()" class="btn btn-primary mt-3">Send</button>
+                    <div class="panel-body">
+                        <div id="community-chat" class="chat-container">
+                            <div class="chat-welcome">
+                                <div class="chat-welcome-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h4>Welcome to the Community!</h4>
+                                <p>Share your thoughts and questions with other learners.</p>
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <textarea id="community-input" class="form-control" placeholder="Share with the community..."></textarea>
+                            <button onclick="sendCommunityMessage()" class="btn btn-primary send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="notes-panel" class="panel">
+                <div class="panel-content">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-sticky-note me-2"></i> Notes</h3>
+                        <button class="btn-icon" onclick="togglePanel('notes-panel')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="notes-input-container">
+                            <textarea id="note-input" class="form-control" placeholder="Write a note..."></textarea>
+                            <button onclick="saveNote()" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Note
+                            </button>
+                        </div>
+                        <div id="notes" class="notes-container">
+                            <div class="notes-empty-state">
+                                <i class="fas fa-clipboard"></i>
+                                <p>Your notes will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="learning-plan-panel" class="panel">
+                <div class="panel-content">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-calendar-day me-2"></i> Today's Study Plan</h3>
+                        <button class="btn-icon" onclick="togglePanel('learning-plan-panel')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <div id="learning-plan" class="learning-plan-container">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Loading your plan...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Notes</h3>
+
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>© 2025 Chek El. All rights reserved.</p>
                     </div>
-                    <div class="card-body">
-                        <textarea id="note-input" class="form-control" placeholder="Write a note..."></textarea>
-                        <button onclick="saveNote()" class="btn btn-primary mt-3">Save Note</button>
-                        <div id="notes" class="notes-container"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Today's Study Plan</h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="learning-plan" class="learning-plan-container learning-plan-content"></div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </footer>
     </div>
-
-    <footer>
-        <p>© 2025 Chek El. All rights reserved.</p>
-    </footer>
 
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <script>
         const socket = io();
+        let hasNotes = false;
+        let hasChatMessages = false;
+        let hasCommunityMessages = false;
+        let activePanel = null;
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        }
+
+        function togglePanel(panelId) {
+            // Close the currently active panel if any
+            if (activePanel && activePanel !== panelId) {
+                const activePanelEl = document.getElementById(activePanel);
+                activePanelEl.classList.remove('active');
+            }
+
+            const panel = document.getElementById(panelId);
+            panel.classList.toggle('active');
+
+            // Update the active panel
+            if (panel.classList.contains('active')) {
+                activePanel = panelId;
+                if (panelId === 'learning-plan-panel') {
+                    loadLearningPlan();
+                }
+            } else {
+                activePanel = null;
+            }
+
+            // On mobile, collapse the sidebar after selecting a panel
+            if (window.innerWidth <= 768 && panel.classList.contains('active')) {
+                document.querySelector('.sidebar').classList.add('collapsed');
+                document.querySelector('.main-content').classList.add('expanded');
+            }
+        }
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const chat = document.getElementById('chat');
             const errorDiv = document.getElementById('error');
             const message = input.value.trim();
+            
             if (!message) {
-                errorDiv.innerText = 'Please enter a question';
+                showError(errorDiv, 'Please enter a question');
                 return;
             }
+            
             try {
                 errorDiv.innerText = '';
-                chat.innerHTML = ''; // Clear previous chat
-                chat.innerHTML += `<div class="chat-message user">${message}</div>`;
+                
+                if (!hasChatMessages) {
+                    chat.innerHTML = '';
+                    hasChatMessages = true;
+                }
+                
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.className = 'chat-message user animate-in';
+                userMessageDiv.textContent = message;
+                chat.appendChild(userMessageDiv);
+                
                 input.value = '';
+                chat.scrollTop = chat.scrollHeight;
+                
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'chat-message ai typing-indicator';
+                typingIndicator.innerHTML = `
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                chat.appendChild(typingIndicator);
+                chat.scrollTop = chat.scrollHeight;
+                
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message })
                 });
+                
                 const data = await response.json();
-                chat.innerHTML += `<div class="chat-message ai">${data.response || 'No response'}</div>`;
+                
+                chat.removeChild(typingIndicator);
+                
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'chat-message ai animate-in';
+                aiMessageDiv.textContent = data.response || 'No response';
+                chat.appendChild(aiMessageDiv);
+                
                 chat.scrollTop = chat.scrollHeight;
             } catch (error) {
-                errorDiv.innerText = 'An error occurred. Please try again.';
+                showError(errorDiv, 'An error occurred. Please try again.');
                 console.error('Error in sendMessage:', error);
             }
         }
@@ -227,15 +310,43 @@
             const input = document.getElementById('community-input');
             const chat = document.getElementById('community-chat');
             const message = input.value.trim();
+            
             if (!message) return;
+            
+            if (!hasCommunityMessages) {
+                chat.innerHTML = '';
+                hasCommunityMessages = true;
+            }
+            
             socket.emit('community_message', message);
             input.value = '';
         }
 
         socket.on('community_message', (data) => {
             const chat = document.getElementById('community-chat');
+            
+            if (!hasCommunityMessages) {
+                chat.innerHTML = '';
+                hasCommunityMessages = true;
+            }
+            
             const className = data.isCurrentUser ? 'user' : 'other';
-            chat.innerHTML += `<div class="chat-message ${className}">${data.message}</div>`;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${className} animate-in`;
+            
+            if (data.username) {
+                const usernameSpan = document.createElement('div');
+                usernameSpan.className = 'message-username';
+                usernameSpan.textContent = data.username;
+                messageDiv.appendChild(usernameSpan);
+            }
+            
+            const messageContent = document.createElement('div');
+            messageContent.textContent = data.message;
+            messageDiv.appendChild(messageContent);
+            
+            chat.appendChild(messageDiv);
             chat.scrollTop = chat.scrollHeight;
         });
 
@@ -243,40 +354,201 @@
             const input = document.getElementById('note-input');
             const notes = document.getElementById('notes');
             const note = input.value.trim();
+            
             if (!note) return;
+            
             try {
                 const response = await fetch('/api/save-note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ note })
                 });
+                
                 const data = await response.json();
+                
                 if (data.status === 'saved') {
-                    notes.innerHTML += `<div>${note}</div>`;
+                    if (!hasNotes) {
+                        notes.innerHTML = '';
+                        hasNotes = true;
+                    }
+                    
+                    const noteDiv = document.createElement('div');
+                    noteDiv.className = 'note-item animate-in';
+                    
+                    const noteContent = document.createElement('div');
+                    noteContent.className = 'note-content';
+                    noteContent.textContent = note;
+                    
+                    const noteDate = document.createElement('div');
+                    noteDate.className = 'note-date';
+                    noteDate.textContent = new Date().toLocaleString();
+                    
+                    noteDiv.appendChild(noteContent);
+                    noteDiv.appendChild(noteDate);
+                    
+                    notes.appendChild(noteDiv);
                     input.value = '';
                     notes.scrollTop = notes.scrollHeight;
+                    
+                    showToast('Note saved successfully!');
                 }
             } catch (error) {
                 console.error('Error in saveNote:', error);
+                showToast('Failed to save note', 'error');
             }
         }
 
         async function loadLearningPlan() {
             const learningPlan = document.getElementById('learning-plan');
+            
             try {
-                learningPlan.innerHTML = '<p>Loading...</p>';
+                learningPlan.innerHTML = `
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Loading your plan...</p>
+                    </div>
+                `;
+                
                 const response = await fetch('/api/get-todays-plan');
                 const data = await response.json();
-                learningPlan.innerHTML = '';
-                if (data.subtopic) {
-                    learningPlan.innerHTML = `<p class="learning-plan-content">${data.subtopic}</p>`;
-                } else {
-                    learningPlan.innerHTML = '<p>No plan for today</p>';
-                }
+                
+                setTimeout(() => {
+                    if (data.subtopic) {
+                        learningPlan.innerHTML = `
+                            <div class="learning-plan-content animate-in">
+                                <h4>Today's Focus:</h4>
+                                <div class="plan-topic">
+                                    <i class="fas fa-book-open me-2"></i>
+                                    ${data.subtopic}
+                                </div>
+                                <div class="plan-actions">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-check me-1"></i> Mark Complete
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-calendar-plus me-1"></i> Reschedule
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        learningPlan.innerHTML = `
+                            <div class="empty-plan animate-in">
+                                <i class="fas fa-calendar-day"></i>
+                                <p>No plan scheduled for today</p>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i> Create Plan
+                                </button>
+                            </div>
+                        `;
+                    }
+                }, 800);
             } catch (error) {
-                learningPlan.innerHTML = '<p>Error loading plan</p>';
+                learningPlan.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Error loading plan</p>
+                        <button onclick="loadLearningPlan()" class="btn btn-primary">
+                            <i class="fas fa-sync-alt me-1"></i> Try Again
+                        </button>
+                    </div>
+                `;
                 console.error('Error in loadLearningPlan:', error);
             }
+        }
+
+        function clearChat(chatId) {
+            const chat = document.getElementById(chatId);
+            
+            if (chatId === 'chat') {
+                chat.innerHTML = `
+                    <div class="chat-welcome">
+                        <div class="chat-welcome-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h4>Hello! How can I help you today?</h4>
+                        <p>Ask me anything about your studies or learning journey.</p>
+                    </div>
+                `;
+                hasChatMessages = false;
+            } else if (chatId === 'community-chat') {
+                chat.innerHTML = `
+                    <div class="chat-welcome">
+                        <div class="chat-welcome-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>Welcome to the Community!</h4>
+                        <p>Share your thoughts and questions with other learners.</p>
+                    </div>
+                `;
+                hasCommunityMessages = false;
+            }
+            
+            showToast('Chat cleared');
+        }
+
+        function clearNotes() {
+            const notes = document.getElementById('notes');
+            notes.innerHTML = `
+                <div class="notes-empty-state">
+                    <i class="fas fa-clipboard"></i>
+                    <p>Your notes will appear here</p>
+                </div>
+            `;
+            hasNotes = false;
+            
+            showToast('Notes cleared');
+        }
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+            element.classList.add('shake');
+            
+            setTimeout(() => {
+                element.classList.remove('shake');
+            }, 500);
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function showToast(message, type = 'success') {
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container';
+                document.body.appendChild(toastContainer);
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            if (type === 'info') icon = 'info-circle';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="toast-message">${message}</div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toastContainer.removeChild(toast);
+                }, 300);
+            }, 3000);
         }
 
         async function logout() {
@@ -285,11 +557,26 @@
                 window.location.href = '/login';
             } catch (error) {
                 console.error('Error in logout:', error);
+                showToast('Logout failed', 'error');
             }
         }
 
+        document.getElementById('user-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        document.getElementById('community-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendCommunityMessage();
+            }
+        });
+
         window.onload = () => {
-            loadLearningPlan(); // Load today's subtopic on page load
+            // Load learning plan only when the panel is opened
         };
     </script>
 </body>
