@@ -1,336 +1,318 @@
-<<<<<<< HEAD
-
-   <!DOCTYPE html>
-   <html>
-   <head>
-       <title>Notes</title>
-   </head>
-   <body>
-       <h1>Notes</h1>
-       <textarea id="noteInput" placeholder="Enter your note"></textarea>
-       <select id="noteStyle">
-           <option value="narrative">Narrative</option>
-           <option value="analogy">Analogy</option>
-           <option value="bullet_points">Bullet Points</option>
-           <option value="step_by_step">Step-by-Step</option>
-       </select>
-       <button onclick="rewriteNote()">Rewrite Note</button>
-       <button onclick="saveNote()">Save Note</button>
-       <div id="rewrittenNote"></div>
-
-       <script>
-           async function rewriteNote() {
-               const note = document.getElementById('noteInput').value;
-               const noteStyle = document.getElementById('noteStyle').value;
-               try {
-                   const response = await fetch('/api/rewrite_note', {
-                       method: 'POST',
-                       headers: { 'Content-Type': 'application/json' },
-                       body: JSON.stringify({ note, note_style: noteStyle })
-                   });
-                   const data = await response.json();
-                   if (response.ok) {
-                       document.getElementById('rewrittenNote').innerText = data.rewritten_note;
-                   } else {
-                       document.getElementById('rewrittenNote').innerText = `Error: ${data.error}`;
-                   }
-               } catch (error) {
-                   document.getElementById('rewrittenNote').innerText = `Error: ${error.message}`;
-               }
-           }
-
-           async function saveNote() {
-               const note = document.getElementById('noteInput').value;
-               const noteStyle = document.getElementById('noteStyle').value;
-               try {
-                   const response = await fetch('/api/save-note', {
-                       method: 'POST',
-                       headers: { 'Content-Type': 'application/json' },
-                       body: JSON.stringify({ note, note_style: noteStyle })
-                   });
-                   const data = await response.json();
-                   if (response.ok) {
-                       alert('Note saved successfully! Rewritten note: ' + (data.rewritten_note || 'N/A'));
-                   } else {
-                       alert('Error: ' + data.error);
-                   }
-               } catch (error) {
-                   alert('Error: ' + error.message);
-               }
-           }
-       </script>
-   </body>
-   </html>
-=======
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes - Chek El</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
             margin: 0;
             padding: 0;
         }
-        header {
+        .navbar {
             background-color: #2935a0;
-            color: white;
-            padding: 10px 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
+            padding: 15px 0;
         }
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
+        .navbar-brand, .nav-link {
+            color: #fff !important;
         }
-        nav ul li {
-            margin: 0 15px;
+        .nav-link:hover {
+            color: #17a2b8 !important;
         }
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        nav ul li a:hover {
-            text-decoration: underline;
-        }
-        main {
-            max-width: 800px;
+        .container {
+            max-width: 900px;
             margin: 80px auto 20px;
             padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        h1, h2 {
-            color: #6f6f6f;
-            text-align: center;
-        }
-        .note-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
             margin-bottom: 20px;
         }
+        .card-header {
+            background-color: #6f6f6f;
+            color: #fff;
+            border-radius: 10px 10px 0 0;
+            padding: 15px;
+        }
+        .card-body {
+            padding: 20px;
+        }
         .note-form textarea, .note-form select {
+            width: 100%;
             padding: 10px;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 16px;
         }
-        .note-form button {
+        .note-form button, .note-item button {
             background-color: #6f6f6f;
-            color: white;
-            padding: 10px;
+            color: #fff;
+            padding: 10px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            margin-right: 10px;
         }
-        .note-form button:hover {
-            background-color: #5a5a5a;
+        .note-form button:hover, .note-item button:hover {
+            background-color: #17a2b8;
         }
         .notes-list {
             margin-top: 20px;
         }
         .note-item {
             border-bottom: 1px solid #ccc;
-            padding: 10px 0;
+            padding: 15px 0;
         }
         .note-item p {
             margin: 5px 0;
         }
-        .note-item button {
-            background-color: #6f6f6f;
-            color: white;
-            padding: 5px 10px;
-            border: none;
+        .error, .success {
+            text-align: center;
+            padding: 10px;
             border-radius: 4px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .note-item button:hover {
-            background-color: #5a5a5a;
+            margin-bottom: 15px;
         }
         .error {
-            color: red;
+            color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .success {
+            color: #28a745;
+            background-color: #d4edda;
+        }
+        footer {
+            background-color: #2935a0;
+            color: #fff;
+            padding: 20px 0;
             text-align: center;
+            margin-top: 40px;
         }
         @media (max-width: 600px) {
-            main {
+            .container {
                 margin: 60px 10px 10px;
                 padding: 15px;
             }
-            nav ul {
+            .navbar-nav {
                 flex-direction: column;
                 align-items: center;
             }
-            nav ul li {
+            .nav-item {
                 margin: 5px 0;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/welcome">Home</a></li>
-                <li><a href="/ask-ai">Ask AI</a></li>
-                <li><a href="/quiz">Quiz</a></li>
-                <li><a href="/community">Community</a></li>
-                <li><a href="/feedback">Feedback</a></li>
-                <li><a href="/learning-planner">Learning Planner</a></li>
-                <li><a href="/notes">Notes</a></li>
-                <li><a href="/logout" id="logout">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <h1>Notes</h1>
-        <div class="note-form">
-            <h2>Add a Note</h2>
-            <textarea id="note-content" rows="5" placeholder="Enter your note..."></textarea>
-            <select id="note-style">
-                <option value="">Select Style (Optional)</option>
-                <option value="narrative">Narrative</option>
-                <option value="analogy">Analogy</option>
-                <option value="bullet_points">Bullet Points</option>
-                <option value="step_by_step">Step by Step</option>
-            </select>
-            <button onclick="saveNote()">Save Note</button>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">Chek El</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/welcome">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ask-ai">Ask AI</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/quiz">Quiz</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/community">Community</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/feedback">Feedback</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/learning-planner">Learning Planner</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/notes">Notes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="notes-list" id="notes-list">
-            <h2>Your Notes</h2>
-            <!-- Notes will be populated here -->
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h3>Add a Note</h3>
+            </div>
+            <div class="card-body note-form">
+                <textarea id="note-content" rows="5" placeholder="Enter your note..."></textarea>
+                <select id="note-style">
+                    <option value="">Select Style (Optional)</option>
+                    <option value="narrative">Narrative</option>
+                    <option value="analogy">Analogy</option>
+                    <option value="bullet_points">Bullet Points</option>
+                    <option value="step_by_step">Step by Step</option>
+                </select>
+                <button onclick="saveNote()">Save Note</button>
+                <button onclick="rewriteNote()">Rewrite Note</button>
+                <div id="message" style="display: none;"></div>
+            </div>
         </div>
-        <p class="error" id="error-message" style="display: none;"></p>
-    </main>
+        <div class="card">
+            <div class="card-header">
+                <h3>Your Notes</h3>
+            </div>
+            <div class="card-body notes-list" id="notes-list">
+                <p>Loading notes...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Chek El. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
     <script>
         // Check authentication
-        fetch('/api/check-auth')
-            .then(response => response.json())
-            .then(data => {
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-auth', { credentials: 'include' });
+                const data = await response.json();
                 if (!data.authenticated) {
                     window.location.href = '/login';
                 } else {
                     loadNotes();
                 }
-            })
-            .catch(error => {
-                showError('Failed to check authentication: ' + error.message);
-            });
+            } catch (error) {
+                showMessage('Failed to check authentication: ' + error.message, false);
+            }
+        }
 
         // Load notes
-        function loadNotes() {
-            fetch('/api/get-notes')
-                .then(response => response.json())
-                .then(data => {
-                    const notesList = document.getElementById('notes-list');
-                    notesList.innerHTML = '<h2>Your Notes</h2>';
-                    if (data.notes.length === 0) {
-                        notesList.innerHTML += '<p>No notes yet.</p>';
-                        return;
-                    }
-                    data.notes.forEach(note => {
-                        const noteDiv = document.createElement('div');
-                        noteDiv.className = 'note-item';
-                        noteDiv.innerHTML = `
-                            <p><strong>Note:</strong> ${note.note}</p>
-                            ${note.note_style ? `<p><strong>Style:</strong> ${note.note_style}</p>` : ''}
-                            ${note.rewritten_note ? `<p><strong>Rewritten:</strong> ${note.rewritten_note}</p>` : ''}
-                            <p><strong>Date:</strong> ${new Date(note.timestamp).toLocaleString()}</p>
-                            <button onclick="rewriteNote('${note.note}', 'narrative')">Rewrite as Narrative</button>
-                            <button onclick="rewriteNote('${note.note}', 'bullet_points')">Rewrite as Bullet Points</button>
-                        `;
-                        notesList.appendChild(noteDiv);
-                    });
-                })
-                .catch(error => {
-                    showError('Failed to load notes: ' + error.message);
+        async function loadNotes() {
+            try {
+                const response = await fetch('/api/get-notes', { credentials: 'include' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                const notesList = document.getElementById('notes-list');
+                notesList.innerHTML = '';
+                if (data.notes.length === 0) {
+                    notesList.innerHTML = '<p>No notes yet.</p>';
+                    return;
+                }
+                data.notes.forEach(note => {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.className = 'note-item';
+                    noteDiv.innerHTML = `
+                        <p><strong>Note:</strong> ${note.note}</p>
+                        ${note.note_style ? `<p><strong>Style:</strong> ${note.note_style}</p>` : ''}
+                        ${note.rewritten_note ? `<p><strong>Rewritten:</strong> ${note.rewritten_note}</p>` : ''}
+                        <p><strong>Date:</strong> ${new Date(note.timestamp).toLocaleString()}</p>
+                        <button onclick="rewriteNoteExisting('${encodeURIComponent(note.note)}', 'narrative')">Narrative</button>
+                        <button onclick="rewriteNoteExisting('${encodeURIComponent(note.note)}', 'bullet_points')">Bullet Points</button>
+                    `;
+                    notesList.appendChild(noteDiv);
                 });
+            } catch (error) {
+                showMessage('Failed to load notes: ' + error.message, false);
+            }
         }
 
         // Save note
-        function saveNote() {
-            const noteContent = document.getElementById('note-content').value;
+        async function saveNote() {
+            const noteContent = document.getElementById('note-content').value.trim();
             const noteStyle = document.getElementById('note-style').value;
             if (!noteContent) {
-                showError('Note content is required');
+                showMessage('Note content is required', false);
                 return;
             }
             const data = { note: noteContent };
             if (noteStyle) data.note_style = noteStyle;
-            fetch('/api/save-note', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'saved') {
-                        document.getElementById('note-content').value = '';
-                        document.getElementById('note-style').value = '';
-                        loadNotes();
-                    } else {
-                        showError(data.error || 'Failed to save note');
-                    }
-                })
-                .catch(error => {
-                    showError('Failed to save note: ' + error.message);
+            try {
+                const response = await fetch('/api/save-note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
                 });
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('note-content').value = '';
+                    document.getElementById('note-style').value = '';
+                    showMessage('Note saved successfully!', true);
+                    loadNotes();
+                } else {
+                    showMessage(result.error || 'Failed to save note', false);
+                }
+            } catch (error) {
+                showMessage('Failed to save note: ' + error.message, false);
+            }
         }
 
-        // Rewrite note
-        function rewriteNote(note, style) {
-            fetch('/api/rewrite_note', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ note, note_style: style })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.rewritten_note) {
-                        // Optionally save rewritten note
-                        fetch('/api/save-note', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ note, note_style: style })
-                        })
-                            .then(() => loadNotes())
-                            .catch(error => showError('Failed to save rewritten note: ' + error.message));
-                    } else {
-                        showError(data.error || 'Failed to rewrite note');
-                    }
-                })
-                .catch(error => {
-                    showError('Failed to rewrite note: ' + error.message);
+        // Rewrite new note
+        async function rewriteNote() {
+            const noteContent = document.getElementById('note-content').value.trim();
+            const noteStyle = document.getElementById('note-style').value;
+            if (!noteContent || !noteStyle) {
+                showMessage('Note content and style are required for rewriting', false);
+                return;
+            }
+            try {
+                const response = await fetch('/api/rewrite_note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ note: noteContent, note_style: noteStyle }),
+                    credentials: 'include'
                 });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage('Note rewritten: ' + data.rewritten_note, true);
+                } else {
+                    showMessage(data.error || 'Failed to rewrite note', false);
+                }
+            } catch (error) {
+                showMessage('Failed to rewrite note: ' + error.message, false);
+            }
         }
 
-        // Show error
-        function showError(message) {
-            const errorElement = document.getElementById('error-message');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-            setTimeout(() => { errorElement.style.display = 'none'; }, 3000);
+        // Rewrite existing note
+        async function rewriteNoteExisting(note, style) {
+            const decodedNote = decodeURIComponent(note);
+            try {
+                const response = await fetch('/api/rewrite_note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ note: decodedNote, note_style: style }),
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage('Note rewritten: ' + data.rewritten_note, true);
+                } else {
+                    showMessage(data.error || 'Failed to rewrite note', false);
+                }
+            } catch (error) {
+                showMessage('Failed to rewrite note: ' + error.message, false);
+            }
+        }
+
+        // Show message
+        function showMessage(message, isSuccess) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = isSuccess ? 'success' : 'error';
+            messageDiv.style.display = 'block';
+            setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
         }
 
         // Logout
-        document.getElementById('logout').addEventListener('click', (e) => {
-            e.preventDefault();
-            fetch('/api/logout', { method: 'POST' })
-                .then(() => { window.location.href = '/login'; })
-                .catch(error => { showError('Failed to logout: ' + error.message); });
-        });
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+                window.location.href = '/login';
+            } catch (error) {
+                showMessage('Failed to logout: ' + error.message, false);
+            }
+        }
+
+        // Initialize
+        window.onload = checkAuth;
     </script>
->>>>>>> 793b379 (Full Commit Deadline Day)
+</body>
+</html>

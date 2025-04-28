@@ -104,7 +104,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Learning Planner</h3>
+                        <h3>Create Learning Plan</h3>
                     </div>
                     <div class="card-body">
                         <input id="topic" class="form-control" placeholder="Enter topic (e.g., Biology)" required>
@@ -125,7 +125,7 @@
                         <h3>Your Learning Plans</h3>
                     </div>
                     <div class="card-body">
-                        <button onclick="loadPlans()" class="btn btn-primary mb-3">Load Plans</button>
+                        <button onclick="loadPlans()" class="btn btn-primary mb-3">Refresh Plans</button>
                         <div id="plans" class="plans-container"></div>
                     </div>
                 </div>
@@ -144,28 +144,41 @@
             const endDate = document.getElementById('end-date').value;
             const complexity = document.getElementById('complexity').value;
             const messageDiv = document.getElementById('message');
+
             if (!topic || !endDate || !complexity) {
                 messageDiv.innerText = 'Please fill in all fields';
+                messageDiv.className = '';
                 return;
             }
+
             try {
-                messageDiv.innerText = '';
+                messageDiv.innerText = 'Creating plan...';
                 const response = await fetch('/api/create-learning-plan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic, end_date: endDate, complexity })
+                    body: JSON.stringify({ topic, end_date: endDate, complexity }),
+                    credentials: 'include'
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
                 const data = await response.json();
-                messageDiv.innerText = data.status === 'saved' ? 'Learning plan created!' : data.error;
-                messageDiv.className = data.status === 'saved' ? 'success' : '';
                 if (data.status === 'saved') {
+                    messageDiv.innerText = 'Learning plan created!';
+                    messageDiv.className = 'success';
                     document.getElementById('topic').value = '';
                     document.getElementById('end-date').value = '';
                     document.getElementById('complexity').value = 'beginner';
-                    loadPlans(); // Refresh plans to show the new one
+                    loadPlans();
+                } else {
+                    messageDiv.innerText = data.error || 'Failed to create plan';
+                    messageDiv.className = '';
                 }
             } catch (error) {
-                messageDiv.innerText = 'An error occurred. Please try again.';
+                messageDiv.innerText = `Error: ${error.message}`;
+                messageDiv.className = '';
                 console.error('Error in createLearningPlan:', error);
             }
         }
@@ -174,16 +187,24 @@
             const plansDiv = document.getElementById('plans');
             try {
                 plansDiv.innerHTML = '<p>Loading...</p>';
-                const response = await fetch('/api/get-learning-plans');
+                const response = await fetch('/api/get-learning-plans', {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
                 const plans = await response.json();
                 plansDiv.innerHTML = '';
+
                 if (plans.length) {
                     plans.forEach(plan => {
                         let subtopicsHtml = '';
                         if (plan.schedule && plan.schedule.length) {
                             subtopicsHtml = '<ul class="subtopic-list">';
                             plan.schedule.forEach(entry => {
-                                subtopicsHtml += <li>${entry.subtopic} (${new Date(entry.date).toLocaleDateString()})</li>;
+                                subtopicsHtml += `<li>${entry.subtopic} (${new Date(entry.date).toLocaleDateString()})</li>`;
                             });
                             subtopicsHtml += '</ul>';
                         } else {
@@ -203,22 +224,29 @@
                     plansDiv.innerHTML = '<p>No learning plans available</p>';
                 }
             } catch (error) {
-                plansDiv.innerHTML = '<p>Error loading plans</p>';
+                plansDiv.innerHTML = `<p>Error loading plans: ${error.message}</p>`;
                 console.error('Error in loadPlans:', error);
             }
         }
 
         async function logout() {
             try {
-                await fetch('/api/logout', { method: 'POST' });
-                window.location.href = '/login';
+                const response = await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    console.error('Logout failed');
+                }
             } catch (error) {
                 console.error('Error in logout:', error);
             }
         }
 
         window.onload = () => {
-            loadPlans(); // Load plans on page load
+            loadPlans();
         };
     </script>
 </body>
