@@ -14,7 +14,7 @@ click==8.1.8
 colorama==0.4.6
 distro==1.9.0
 dnspython==2.7.0
-eventlet==0.36.1
+gevent==23.9.1
 Flask==3.1.0
 flask-cors==5.0.1
 Flask-SocketIO==5.5.1
